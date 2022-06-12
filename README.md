@@ -1,2 +1,1 @@
-# tests
-test some features
+# test some features
