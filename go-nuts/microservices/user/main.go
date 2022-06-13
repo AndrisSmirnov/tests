@@ -14,7 +14,8 @@ func main() {
 		panic(err)
 	}
 
-	go nats_server.Subscriber("chat_1")
+	// go nats_server.Subscriber("chat_1")
+	go nats_server.Subscribers("chat_1", "groupOne")
 
 	listeningPort := os.Getenv("SERVICE_PORT")
 

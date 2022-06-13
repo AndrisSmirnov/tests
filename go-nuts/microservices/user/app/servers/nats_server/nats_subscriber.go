@@ -40,9 +40,46 @@ func Subscriber(subject string) {
 			return
 		}
 
-		fmt.Printf("\n~~~~~~~~~~~~~~~~~~~~~~~\nUSER:: Received a request ...\nChatName:\t%s\nFrom:\t\t%s\nTo:\t\t%s\nMessage:\t%s\n~~~~~~~~~~~~~~~~~~~~~~~\n", received.ChatName, received.From, received.To, received.Message)
+		fmt.Printf("\n~~~~~~~~~~~~~~~~~~~~~~~\nUSER:: Received a request ...\nChatName:\t%s\nFrom:\t\t%s\nTo:\t\t%s\nMessage:\t%s\n~~~~~~~~~~~~~~~~~~~~~~~\n",
+			received.ChatName,
+			received.From,
+			received.To,
+			received.Message)
+
 		nc.Publish(fmt.Sprintf("%s_response", subject), []byte("I got ya"))
 		return
 	})
+}
 
+func Subscribers(subject, groupName string) {
+	time.Sleep(time.Second * 5)
+	subscribers := []string{"ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"}
+	ch := make(chan string, 7)
+
+	for _, subscriber := range subscribers {
+		ch <- subscriber
+
+		go func() {
+			received := &dto.SendMessageRequest{}
+			nc, err := nats.Connect("nats")
+			if err != nil {
+				panic(err)
+			}
+
+			nc.QueueSubscribe(subject, groupName, func(mes *nats.Msg) {
+				err := json.Unmarshal([]byte(string(mes.Data)), &received)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				fmt.Printf("\n~~~~~~~~~~~~~~~~~~~~~~~\nUSER:: Received a request %s ...\nChatName:\t%s\nFrom:\t\t%s\nTo:\t\t%s\nMessage:\t%s\n~~~~~~~~~~~~~~~~~~~~~~~\n",
+					<-ch,
+					received.ChatName,
+					received.From,
+					received.To,
+					received.Message)
+			})
+		}()
+	}
 }

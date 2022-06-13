@@ -41,8 +41,11 @@ func Publisher(subject, From, To, Message string) {
 			To:       To,
 			Message:  fmt.Sprintf("%s_%d!", Message, i),
 		}
-		// fmt.Printf("\n~~~~~~~~~~~~~~~~~~~~~~~\nSending request ...\nChatName:\t%s\nFrom:\t\t%s\nTo:\t\t%s\nMessage:\t%s\n~~~~~~~~~~~~~~~~~~~~~~~\n", req.ChatName, req.From, req.To, req.Message)
-
+		fmt.Printf("\n~~~~~~~~~~~~~~~~~~~~~~~\nUSER:: Sending a request ...\nChatName:\t%s\nFrom:\t\t%s\nTo:\t\t%s\nMessage:\t%s\n~~~~~~~~~~~~~~~~~~~~~~~\n",
+			req.ChatName,
+			req.From,
+			req.To,
+			req.Message)
 		// ec.Publish(subject, req)
 		sendCh <- req
 		time.Sleep(time.Second * 5)

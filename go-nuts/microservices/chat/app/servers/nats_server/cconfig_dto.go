@@ -12,14 +12,10 @@ var (
 )
 
 func Launch() {
-
-	// nats.Connect just gives us a bare connection to NATS
-	// nc, err := nats.Connect(nats.DefaultURL)
 	nc, err := nats.Connect("nats")
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println(nc)
-
 }
