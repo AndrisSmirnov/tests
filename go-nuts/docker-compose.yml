@@ -1,0 +1,56 @@
+version: "3.7"
+
+services:
+  chat:
+    container_name: chat
+    build:
+      context: ./microservices/chat
+      dockerfile: Dockerfile
+    volumes:
+      - ./microservices/chat:/usr/src/app
+    command: fresh
+    ports:
+      - 3000:3000
+    working_dir: /usr/src/app
+    restart: unless-stopped
+    networks:
+      - backend-office
+  user:
+    container_name: user
+    build:
+      context: ./microservices/user
+      dockerfile: Dockerfile
+    volumes:
+      - ./microservices/user:/usr/src/app
+    command: fresh
+    ports:
+      - 3003:3003
+    working_dir: /usr/src/app
+    restart: unless-stopped
+    networks:
+      - backend-office
+  nats:
+    image: nats
+    # command: "-c /etc/nats/nats.conf --cluster nats://0.0.0.0:6222 --routes=nats://ruser:T0pS3cr3t@nats:6222"
+    volumes:
+      - ../microservices/chat/app/server/nats_server:/etc/nats
+    ports:
+      - 4222:4222
+    networks:
+      - backend-office
+  # scylladb:
+  #   container_name: scylladb
+  #   image: scylladb/scylla
+  #   command: "--seeds scylladb --smp 1 --memory 256M"
+  #   ports:
+  #     - 9042:9042
+  #   restart: unless-stopped
+  #   networks:
+  #     - backend-office
+  #   # volumes:
+  #   #   - "./scylla/scylla-server:/etc/sysconfig/scylla-server"
+
+
+networks:
+  backend-office:
+    driver: bridge
