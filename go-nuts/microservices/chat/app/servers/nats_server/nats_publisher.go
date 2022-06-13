@@ -9,12 +9,16 @@ import (
 )
 
 func Publisher(subject, From, To, Message string) {
+	time.Sleep(time.Second * 5)
+
+	i := 0
+	getAnswer := true
+
 	nc, err := nats.Connect("nats")
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(nc)
 	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
 	if err != nil {
 		panic(err)
@@ -24,8 +28,13 @@ func Publisher(subject, From, To, Message string) {
 	sendCh := make(chan *dto.SendMessageRequest)
 	ec.BindSendChan(subject, sendCh)
 
-	i := 0
-	for {
+	nc.Subscribe(fmt.Sprintf("%s_response", subject), func(m *nats.Msg) {
+		fmt.Printf("\n~~~~~~~~~~~~~~~~~~~~~~~\nCHAT:: Received a message: %s\n~~~~~~~~~~~~~~~~~~~~~~~\n", string(m.Data))
+		nc.Close()
+		getAnswer = false
+	})
+
+	for getAnswer {
 		req := &dto.SendMessageRequest{
 			ChatName: subject,
 			From:     From,
@@ -39,4 +48,6 @@ func Publisher(subject, From, To, Message string) {
 		time.Sleep(time.Second * 5)
 		i = i + 1
 	}
+
+	fmt.Println("CHAT:: get out")
 }

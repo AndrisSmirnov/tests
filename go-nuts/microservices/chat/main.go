@@ -16,8 +16,7 @@ func main() {
 
 	listeningPort := os.Getenv("SERVICE_PORT")
 
-	// nats_server.Launch()
-	nats_server.Publisher("chat_1", "admin", "user123", "ALOHA")
+	go nats_server.Publisher("chat_1", "admin", "user123", "ALOHA")
 
 	router := controllers.InitControllers()
 	fmt.Println("1_Chat")

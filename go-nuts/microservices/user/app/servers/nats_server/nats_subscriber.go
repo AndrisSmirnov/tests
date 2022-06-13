@@ -10,11 +10,12 @@ import (
 )
 
 func Subscriber(subject string) {
+	time.Sleep(time.Second * 5)
+
 	nc, err := nats.Connect("nats")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(nc)
 
 	received := &dto.SendMessageRequest{}
 
@@ -22,10 +23,10 @@ func Subscriber(subject string) {
 		not_have := 0
 		for {
 			if len(received.Message) > 1 {
-				fmt.Printf("\n\nMESSAGE:\t%s\n\n", received.Message)
+				fmt.Printf("\n\nUSER:: MESSAGE:\t%s\n\n", received.Message)
 				return
 			} else {
-				fmt.Printf("\n\nNot have anything yet #%d\n\n", not_have)
+				fmt.Printf("\n\nUSER:: Not have anything yet #%d\n\n", not_have)
 				not_have++
 			}
 			time.Sleep(time.Second * 5)
@@ -39,7 +40,8 @@ func Subscriber(subject string) {
 			return
 		}
 
-		fmt.Printf("\n~~~~~~~~~~~~~~~~~~~~~~~\nReceived a request ...\nChatName:\t%s\nFrom:\t\t%s\nTo:\t\t%s\nMessage:\t%s\n~~~~~~~~~~~~~~~~~~~~~~~\n", received.ChatName, received.From, received.To, received.Message)
+		fmt.Printf("\n~~~~~~~~~~~~~~~~~~~~~~~\nUSER:: Received a request ...\nChatName:\t%s\nFrom:\t\t%s\nTo:\t\t%s\nMessage:\t%s\n~~~~~~~~~~~~~~~~~~~~~~~\n", received.ChatName, received.From, received.To, received.Message)
+		nc.Publish(fmt.Sprintf("%s_response", subject), []byte("I got ya"))
 		return
 	})
 
